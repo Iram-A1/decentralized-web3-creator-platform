@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Decentralized Web3 Creator Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(135deg, #7C3AED, #EC4899, #F97316);
+      padding: 2rem; text-align: center; color: white;
+    }
+    .header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header p { font-size: 1rem; opacity: 0.9; }
+
+    .connect-section {
+      display: flex; justify-content: center; align-items: center;
+      gap: 1rem; padding: 1.25rem;
+      background: white; border-bottom: 1px solid #eee;
+    }
+    #connectBtn {
+      background: linear-gradient(135deg, #7C3AED, #EC4899);
+      color: white; border: none; padding: 0.7rem 1.75rem;
+      border-radius: 50px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all 0.3s;
+    }
+    #connectBtn:hover { opacity: 0.9; transform: translateY(-2px); }
+    #walletAddress { font-size: 0.85rem; color: #7C3AED; font-weight: 500; }
+
+    .contracts-info {
+      max-width: 900px; margin: 1.5rem auto;
+      background: white; border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .contracts-info h3 {
+      font-size: 0.75rem; letter-spacing: 0.15em;
+      color: #999; text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .contract-row {
+      display: flex; justify-content: space-between;
+      padding: 0.4rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.875rem;
+    }
+    .contract-row:last-child { border-bottom: none; }
+    .contract-name { color: #7C3AED; font-weight: 600; }
+    .contract-addr { color: #666; font-family: monospace; font-size: 0.8rem; }
+
+    .grid {
+      max-width: 900px; margin: 0 auto 2rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.25rem; padding: 0 1rem;
+    }
+
+    .card {
+      background: white; border-radius: 12px; padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .card h3 {
+      background: linear-gradient(135deg, #7C3AED, #EC4899);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 1.1rem; margin-bottom: 1rem;
+    }
+
+    input {
+      width: 100%; padding: 0.65rem 0.85rem;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      font-size: 0.9rem; margin-bottom: 0.75rem;
+      transition: border-color 0.2s; outline: none;
+    }
+    input:focus { border-color: #7C3AED; }
+
+    button {
+      width: 100%; padding: 0.7rem;
+      background: linear-gradient(135deg, #7C3AED, #EC4899, #F97316);
+      color: white; border: none; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+
+    .status {
+      margin-top: 0.75rem; font-size: 0.85rem;
+      padding: 0.5rem 0.75rem; border-radius: 6px; display: none;
+    }
+    .status.success { background: #d1fae5; color: #065f46; display: block; }
+    .status.error   { background: #fee2e2; color: #991b1b; display: block; }
+    .status.loading { background: #ede9fe; color: #5b21b6; display: block; }
+
+    footer {
+      text-align: center; padding: 1.5rem;
+      color: #999; font-size: 0.8rem;
+      border-top: 1px solid #eee; background: white;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🌐 Decentralized Web3 Creator Platform</h1>
+  <p>Blockchain-Powered Content Ownership & Rewards — DEVP-600 · Saskatchewan Polytechnic</p>
+</div>
+
+<!-- CONNECT -->
+<div class="connect-section">
+  <button id="connectBtn" onclick="connectWallet()">🦊 Connect MetaMask</button>
+  <span id="walletAddress">Not connected</span>
+</div>
+
+<!-- CONTRACT ADDRESSES -->
+<div class="contracts-info">
+  <h3>📋 Deployed Contracts — Sepolia Testnet</h3>
+  <div class="contract-row">
+    <span class="contract-name">CreatorToken (ERC-20)</span>
+    <span class="contract-addr">0xC414B808671BE4A3091A1A017EF9a5356061210D</span>
+  </div>
+  <div class="contract-row">
+    <span class="contract-name">ContentNFT (ERC-721)</span>
+    <span class="contract-addr">0x7835C815A94a7C94d736CC1433993B41fa262518</span>
+  </div>
+  <div class="contract-row">
+    <span class="contract-name">CreatorPlatform</span>
+    <span class="contract-addr">0x9b9e8bE79Ec2D3afd704932197bA07C305eC58d7</span>
+  </div>
+</div>
+
+<!-- FEATURE CARDS -->
+<div class="grid">
+
+  <!-- REGISTER -->
+  <div class="card">
+    <div class="card-icon">✍️</div>
+    <h3>Register as Creator</h3>
+    <input type="text" id="creatorName" placeholder="Your creator name (e.g. Iram)" maxlength="50"/>
+    <button onclick="registerCreator()">Register Now</button>
+    <div class="status" id="registerStatus"></div>
+  </div>
+
+  <!-- TIP -->
+  <div class="card">
+    <div class="card-icon">💸</div>
+    <h3>Tip a Creator</h3>
+    <input type="text" id="tipAddress" placeholder="Creator wallet address (0x...)"/>
+    <input type="number" id="tipAmount" placeholder="Amount in ETH (e.g. 0.001)" step="0.0001" min="0.0001"/>
+    <button onclick="tipCreator()">Send Tip 💜</button>
+    <div class="status" id="tipStatus"></div>
+  </div>
+
+  <!-- MINT NFT -->
+  <div class="card">
+    <div class="card-icon">🎨</div>
+    <h3>Mint Content NFT</h3>
+    <input type="text" id="nftTitle" placeholder="Content title" maxlength="100"/>
+    <input type="text" id="nftURI" placeholder="Content URI (https://...)"/>
+    <button onclick="mintNFT()">Mint NFT ✨</button>
+    <div class="status" id="mintStatus"></div>
+  </div>
+
+  <!-- CHECK CREATOR -->
+  <div class="card">
+    <div class="card-icon">🔍</div>
+    <h3>Check Creator</h3>
+    <input type="text" id="checkAddress" placeholder="Creator wallet address (0x...)"/>
+    <button onclick="checkCreator()">Look Up</button>
+    <div class="status" id="checkStatus"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Iram Akram & Harjinder Kaur · DEVP-600 · Saskatchewan Polytechnic · 2026
+</footer>
+
+<script>
+// ─── CONTRACT ADDRESSES ───
+const CREATOR_PLATFORM_ADDRESS = "0x9b9e8bE79Ec2D3afd704932197bA07C305eC58d7";
+const CONTENT_NFT_ADDRESS      = "0x7835C815A94a7C94d736CC1433993B41fa262518";
+
+// ─── ABIs — ONLY functions in deployed contracts ───
+const PLATFORM_ABI = [
+  {
+    "inputs":[{"internalType":"string","name":"name","type":"string"}],
+    "name":"registerCreator","outputs":[],"stateMutability":"nonpayable","type":"function"
+  },
+  {
+    "inputs":[{"internalType":"address","name":"creatorAddress","type":"address"}],
+    "name":"tipCreator","outputs":[],"stateMutability":"payable","type":"function"
+  },
+  {
+    "inputs":[{"internalType":"address","name":"","type":"address"}],
+    "name":"creators",
+    "outputs":[
+      {"internalType":"string","name":"name","type":"string"},
+      {"internalType":"bool","name":"isRegistered","type":"bool"},
+      {"internalType":"uint256","name":"totalTipsReceived","type":"uint256"}
+    ],
+    "stateMutability":"view","type":"function"
+  }
+];
+
+const NFT_ABI = [
+  {
+    "inputs":[
+      {"internalType":"string","name":"title","type":"string"},
+      {"internalType":"string","name":"tokenURI","type":"string"}
+    ],
+    "name":"mintContent","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
+    "stateMutability":"nonpayable","type":"function"
+  }
+];
+
+// ─── STATE ───
+let web3, userAccount, platformContract, nftContract;
+
+// ─── STATUS HELPER ───
+function showStatus(id, message, type) {
+  const el = document.getElementById(id);
+  el.textContent = message;
+  el.className = "status " + type;
+}
+
+// ─── CONNECT WALLET ───
+async function connectWallet() {
+  if (typeof window.ethereum === "undefined") {
+    alert("MetaMask not found! Please install MetaMask first.");
+    return;
+  }
+  try {
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    userAccount = accounts[0];
+    web3 = new Web3(window.ethereum);
+
+    const chainId = await web3.eth.getChainId();
+    if (chainId !== 11155111) {
+      alert("Please switch MetaMask to Sepolia testnet!");
+      return;
+    }
+
+    platformContract = new web3.eth.Contract(PLATFORM_ABI, CREATOR_PLATFORM_ADDRESS);
+    nftContract      = new web3.eth.Contract(NFT_ABI, CONTENT_NFT_ADDRESS);
+
+    document.getElementById("connectBtn").textContent = "✅ Connected";
+    document.getElementById("connectBtn").style.background = "linear-gradient(135deg, #059669, #10b981)";
+    document.getElementById("walletAddress").textContent =
+      userAccount.slice(0,6) + "..." + userAccount.slice(-4);
+
+  } catch (err) {
+    alert("Connection failed: " + err.message);
+  }
+}
+
+// ─── REGISTER CREATOR ───
+async function registerCreator() {
+  if (!userAccount) { alert("Please connect MetaMask first!"); return; }
+  const name = document.getElementById("creatorName").value.trim();
+  if (!name) { alert("Please enter a creator name!"); return; }
+
+  showStatus("registerStatus", "⏳ Registering... please confirm in MetaMask", "loading");
+  try {
+    const gasEstimate = await platformContract.methods
+      .registerCreator(name).estimateGas({ from: userAccount });
+    const gasLimit = Math.floor(gasEstimate * 1.2);
+
+    await platformContract.methods.registerCreator(name).send({
+      from: userAccount, gas: gasLimit
+    });
+
+    showStatus("registerStatus", "✅ Successfully registered as: " + name, "success");
+    document.getElementById("creatorName").value = "";
+  } catch (err) {
+    const msg = err.message.includes("already registered")
+      ? "⚠️ This wallet is already registered as a creator!"
+      : "❌ Error: " + err.message.slice(0, 120);
+    showStatus("registerStatus", msg, "error");
+  }
+}
+
+// ─── TIP CREATOR ───
+async function tipCreator() {
+  if (!userAccount) { alert("Please connect MetaMask first!"); return; }
+  const address = document.getElementById("tipAddress").value.trim();
+  const amount  = document.getElementById("tipAmount").value.trim();
+  if (!address || !amount) { alert("Please fill in all fields!"); return; }
+  if (!web3.utils.isAddress(address)) { alert("Invalid wallet address!"); return; }
+
+  showStatus("tipStatus", "⏳ Sending tip... please confirm in MetaMask", "loading");
+  try {
+    const weiAmount = web3.utils.toWei(amount, "ether");
+    const gasEstimate = await platformContract.methods
+      .tipCreator(address).estimateGas({ from: userAccount, value: weiAmount });
+    const gasLimit = Math.floor(gasEstimate * 1.2);
+
+    await platformContract.methods.tipCreator(address).send({
+      from: userAccount, value: weiAmount, gas: gasLimit
+    });
+
+    showStatus("tipStatus", "✅ Tip of " + amount + " ETH sent successfully!", "success");
+    document.getElementById("tipAddress").value = "";
+    document.getElementById("tipAmount").value  = "";
+  } catch (err) {
+    const msg = err.message.includes("creator not registered")
+      ? "⚠️ That address is not a registered creator. They must register first!"
+      : "❌ Error: " + err.message.slice(0, 120);
+    showStatus("tipStatus", msg, "error");
+  }
+}
+
+// ─── MINT NFT ───
+async function mintNFT() {
+  if (!userAccount) { alert("Please connect MetaMask first!"); return; }
+  const title = document.getElementById("nftTitle").value.trim();
+  const uri   = document.getElementById("nftURI").value.trim();
+  if (!title || !uri) { alert("Please fill in all fields!"); return; }
+
+  showStatus("mintStatus", "⏳ Minting NFT... please confirm in MetaMask", "loading");
+  try {
+    // Deployed contract only takes 2 params: title and tokenURI
+    const gasEstimate = await nftContract.methods
+      .mintContent(title, uri).estimateGas({ from: userAccount });
+    const gasLimit = Math.floor(gasEstimate * 1.2);
+
+    await nftContract.methods.mintContent(title, uri).send({
+      from: userAccount, gas: gasLimit
+    });
+
+    showStatus("mintStatus", "✅ NFT minted successfully: " + title, "success");
+    document.getElementById("nftTitle").value = "";
+    document.getElementById("nftURI").value   = "";
+  } catch (err) {
+    showStatus("mintStatus", "❌ Error: " + err.message.slice(0, 120), "error");
+  }
+}
+
+// ─── CHECK CREATOR ───
+async function checkCreator() {
+  if (!userAccount) { alert("Please connect MetaMask first!"); return; }
+  const address = document.getElementById("checkAddress").value.trim();
+  if (!address) { alert("Please enter a wallet address!"); return; }
+  if (!web3.utils.isAddress(address)) { alert("Invalid wallet address!"); return; }
+
+  showStatus("checkStatus", "⏳ Looking up creator...", "loading");
+  try {
+    // Use creators mapping directly — matches deployed contract exactly
+    const creator = await platformContract.methods.creators(address).call();
+
+    if (!creator.isRegistered) {
+      showStatus("checkStatus", "⚠️ This address is not a registered creator.", "error");
+      return;
+    }
+
+    const tipsETH = parseFloat(web3.utils.fromWei(creator.totalTipsReceived.toString(), "ether")).toFixed(4);
+    showStatus("checkStatus",
+      "✅ Name: " + creator.name + " | Tips Received: " + tipsETH + " ETH",
+      "success"
+    );
+  } catch (err) {
+    showStatus("checkStatus", "❌ Error: " + err.message.slice(0, 120), "error");
+  }
+}
+
+// Auto-reconnect if already connected
+window.addEventListener("load", async () => {
+  if (typeof window.ethereum !== "undefined") {
+    const accounts = await window.ethereum.request({ method: "eth_accounts" });
+    if (accounts.length > 0) connectWallet();
+  }
+});
+</script>
+</body>
+</html>
