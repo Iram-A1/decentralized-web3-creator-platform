@@ -22,7 +22,7 @@ A blockchain-based creator monetization platform deployed on AWS through a compl
 ## Tech Stack
 - Solidity ^0.8.24 + OpenZeppelin
 - Remix IDE
-- MetaMask + Web3.js
+- MetaMask + Web3.js 
 - AWS S3 + CloudFormation
 - AWS CloudWatch + SNS
 - GitHub Actions CI/CD
